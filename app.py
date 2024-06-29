@@ -1,9 +1,9 @@
+import enum
 from flask_openapi3 import OpenAPI, Info, Tag
 from flask import redirect
 from urllib.parse import unquote
 
 from sqlalchemy.exc import IntegrityError
-
 from model import Session, Study
 from logger import logger
 from schemas import *
@@ -17,6 +17,11 @@ CORS(app)
 home_tag = Tag(name="Documentação", description="Seleção de documentação: Swagger, Redoc ou RapiDoc")
 study_tag = Tag(name="Study", description="Adição, visualização e remoção de study à base")
 
+
+class PriorityEnum(str, enum.Enum):
+    high = "high"
+    medium = "medium"
+    low = "low"
 
 @app.get('/', tags=[home_tag])
 def home():
@@ -33,8 +38,14 @@ def add_study(body: StudySchema):
     Retorna uma representação dos studies.
     """
     if not body:
-         error_msg = "Não foi possível salvar novo item :/"
-         return {"mesage": error_msg}, 400
+        error_msg = "Não foi possível salvar novo item :/"
+        return {"message": error_msg}, 400
+    
+    # Validando prioridade
+    if body.priority not in PriorityEnum.__members__:
+        error_msg = f"Prioridade inválida: {body.priority}. Deve ser uma das seguintes: high, medium, low."
+        return {"message": error_msg}, 400
+    
     
     study = Study(
         title=body.title,
