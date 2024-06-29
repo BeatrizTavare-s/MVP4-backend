@@ -37,23 +37,21 @@ def add_study(body: StudySchema):
 
     Retorna uma representação dos studies.
     """
-    if not body:
-        error_msg = "Não foi possível salvar novo item :/"
-        return {"message": error_msg}, 400
-    
-    # Validando prioridade
-    if body.priority not in PriorityEnum.__members__:
-        error_msg = f"Prioridade inválida: {body.priority}. Deve ser uma das seguintes: high, medium, low."
-        return {"message": error_msg}, 400
-    
-    
-    study = Study(
-        title=body.title,
-        description=body.description,
-        content=body.content,
-        priority=body.priority)
-    logger.debug(f"Adicionando study de titulo: '{study.title}'")
     try:
+        if not body:
+            error_msg = "Não foi possível salvar novo item :/"
+            return {"message": error_msg}, 400
+        
+        # Validando prioridade
+        if body.priority not in PriorityEnum.__members__:
+            error_msg = f"Prioridade inválida: {body.priority}. Deve ser uma das seguintes: high, medium, low."
+            return {"message": error_msg}, 400
+        study = Study(
+            title=body.title,
+            description=body.description,
+            content=body.content,
+            priority=body.priority)
+        logger.debug(f"Adicionando study de titulo: '{study.title}'")
         # criando conexão com a base
         session = Session()
         # adicionando study
@@ -77,14 +75,19 @@ def completed_study(query: StudyBuscaSchema):
 
     Retorna uma representação dos studies.
     """
-    study_id = query.id
-    logger.debug(f"Completa study de id: '{study_id}'")
     try:
+        study_id = query.id
+        logger.debug(f"Completa study de id: '{study_id}'")
         # criando conexão com a base
         session = Session()
-        # fazendo a busca
-        study = session.query(Study).filter(Study.id == study_id).update({'status': "completed"})
-        # efetivando o camando de adição de novo item na tabela
+        # Atualizando o status do estudo
+        updated_rows = session.query(Study).filter(Study.id == study_id).update({'status': "completed"})
+        
+        if updated_rows == 0:
+            # Se nenhum estudo foi atualizado, retorna 404
+            error_msg = "Study não encontrado na base :/"
+            logger.warning(f"Erro ao buscar study '{study_id}', {error_msg}")
+            return {"message": error_msg}, 404
         session.commit()
         logger.debug(f"Completa study de id: '{query.id}'")
         sucess_msg = "Study completado"
@@ -108,9 +111,14 @@ def uncompleted_study(query: StudyBuscaSchema):
     try:
         # criando conexão com a base
         session = Session()
-        # fazendo a busca
-        study = session.query(Study).filter(Study.id == study_id).update({'status': "uncompleted"})
-        # efetivando o camando de adição de novo item na tabela
+        # Atualizando o status do estudo
+        updated_rows = session.query(Study).filter(Study.id == study_id).update({'status': "uncompleted"})
+        
+        if updated_rows == 0:
+            # Se nenhum estudo foi atualizado, retorna 404
+            error_msg = "Study não encontrado na base :/"
+            logger.warning(f"Erro ao buscar study '{study_id}', {error_msg}")
+            return {"message": error_msg}, 404
         session.commit()
         logger.debug(f"Completa study de id: '{query.id}'")
         sucess_msg = "Study atualizado para não completado"
@@ -130,24 +138,30 @@ def get_studies(query: StudyBuscaSchemaByFilters ):
 
     Retorna uma representação da listagem de studies.
     """
-    logger.debug(f"Coletando studies ")
-    # criando conexão com a base
-    session = Session()
-    # fazendo a busca
-    print(query.status)
-    if not query.status:
-        studies = session.query(Study).all()
-    else:
-        studies = session.query(Study).filter(Study.status == query.status).all()
-    print(studies)
+    try:
+        logger.debug(f"Coletando studies ")
+        # criando conexão com a base
+        session = Session()
+        # fazendo a busca
+        print(query.status)
+        if not query.status:
+            studies = session.query(Study).all()
+        else:
+            studies = session.query(Study).filter(Study.status == query.status).all()
+        print(studies)
 
-    if not studies:
-        # se não há studies cadastrados
-        return {"studies": []}, 200
-    else:
-        logger.debug(f"%d rodutos econtrados" % len(studies))
-        # retorna a representação de study
-        return apresenta_studies(studies), 200
+        if not studies:
+            # se não há studies cadastrados
+            return {"studies": []}, 200
+        else:
+            logger.debug(f"%d rodutos econtrados" % len(studies))
+            # retorna a representação de study
+            return apresenta_studies(studies), 200
+    except Exception as e:
+        # se o study não foi encontrado
+        error_msg = "Erro ao tentar buscar a lista de studies"
+        logger.warning(f"Erro ao buscar a lista de studies, {error_msg}")
+        return {"mesage": error_msg}, 404
 
 
 @app.get('/study', tags=[study_tag],
@@ -157,22 +171,28 @@ def get_study(query: StudyBuscaSchema):
 
     Retorna uma representação dos studies
     """
-    study_id = query.id
-    logger.debug(f"Coletando dados sobre study #{study_id}")
-    # criando conexão com a base
-    session = Session()
-    # fazendo a busca
-    study = session.query(Study).filter(Study.id == study_id).first()
+    try:
+        study_id = query.id
+        logger.debug(f"Coletando dados sobre study #{study_id}")
+        # criando conexão com a base
+        session = Session()
+        # fazendo a busca
+        study = session.query(Study).filter(Study.id == study_id).first()
 
-    if not study:
+        if not study:
+            # se o study não foi encontrado
+            error_msg = "Study não encontrado na base :/"
+            logger.warning(f"Erro ao buscar study '{study_id}', {error_msg}")
+            return {"mesage": error_msg}, 404
+        else:
+            logger.debug(f"Study encontrado: '{study.title}'")
+            # retorna a representação de study
+            return apresenta_study(study), 200
+    except Exception as e:
         # se o study não foi encontrado
-        error_msg = "Study não encontrado na base :/"
-        logger.warning(f"Erro ao buscar study '{study_id}', {error_msg}")
+        error_msg = "Erro ao tentar buscar o study"
+        logger.warning(f"Erro ao buscar study #'{study_id}', {error_msg}")
         return {"mesage": error_msg}, 404
-    else:
-        logger.debug(f"Study encontrado: '{study.title}'")
-        # retorna a representação de study
-        return apresenta_study(study), 200
 
 
 @app.delete('/study', tags=[study_tag],
@@ -182,21 +202,25 @@ def del_study(query: StudyBuscaSchema):
 
     Retorna uma mensagem de confirmação da remoção.
     """
-    study_id = query.id
-    print(study_id)
-    logger.debug(f"Deletando dados sobre study #{study_id}")
-    # criando conexão com a base
-    session = Session()
-    # fazendo a remoção
-    count = session.query(Study).filter(Study.id == study_id).delete()
-    session.commit()
+    try:
+        study_id = query.id
+        print(study_id)
+        logger.debug(f"Deletando dados sobre study #{study_id}")
+        # criando conexão com a base
+        session = Session()
+        study = session.query(Study).filter(Study.id == study_id).first()
+        if not study:
+            error_msg = "Study não encontrado na base :/"
+            logger.warning(f"Erro ao deletar study #{study_id}, {error_msg}")
+            return {"message": error_msg}, 404
+        
+        # Faz a remoção
+        session.delete(study)
+        session.commit()
+        return {"mesage": "Study removido", "id": study_id}, 200
 
-    if count:
-        # retorna a representação da mensagem de confirmação
-        logger.debug(f"Deletado study #{study_id}")
-        return {"mesage": "Study removido", "id": study_id}
-    else:
+    except Exception as e:
         # se o study não foi encontrado
-        error_msg = "Study não encontrado na base :/"
+        error_msg = "Erro ao tentar deletar o study"
         logger.warning(f"Erro ao deletar study #'{study_id}', {error_msg}")
-        return {"mesage": error_msg}, 404
+        return {"message": error_msg}, 404
