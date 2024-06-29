@@ -22,9 +22,10 @@ class StudyBuscaSchema(BaseModel):
 
 class StudyBuscaSchemaByFilters(BaseModel):
     """ Define como deve ser a estrutura que representa a busca. Que será
-        feita apenas com base no titulo do study.
+        feita apenas com base no status do study e tambem na ordenação, ambas são opcionais.
     """
     status: str = None
+    sort: str = None
 
 
 

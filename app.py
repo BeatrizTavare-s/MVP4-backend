@@ -68,7 +68,7 @@ def add_study(body: StudySchema):
         return {"mesage": error_msg}, 400
     
 
-@app.put('/study/completed', tags=[study_tag],
+@app.patch('/study/completed', tags=[study_tag],
           responses={"200": StudyViewSchemaCompleted, "409": ErrorSchema, "400": ErrorSchema})
 def completed_study(query: StudyBuscaSchema):
     """Atualiza o status do Study à base de dados
@@ -99,7 +99,7 @@ def completed_study(query: StudyBuscaSchema):
         logger.warning(f"Erro ao atualizar para completed o study '{query.id}', {error_msg}")
         return {"mesage": error_msg}, 400
     
-@app.put('/study/uncompleted', tags=[study_tag],
+@app.patch('/study/uncompleted', tags=[study_tag],
           responses={"200": StudyViewSchemaCompleted, "409": ErrorSchema, "400": ErrorSchema})
 def uncompleted_study(query: StudyBuscaSchema):
     """Atualiza o status do Study à base de dados
@@ -143,12 +143,21 @@ def get_studies(query: StudyBuscaSchemaByFilters ):
         # criando conexão com a base
         session = Session()
         # fazendo a busca
-        print(query.status)
+        print("sort:" , query.sort)
         if not query.status:
             studies = session.query(Study).all()
         else:
             studies = session.query(Study).filter(Study.status == query.status).all()
         print(studies)
+
+        # ordenando os studies
+
+        if query.sort:
+            # Definindo a ordem (ascendente por padrão)
+            priority = {"high": 1, "medium": 2, "low": 3}
+            sort = query.sort if query.sort in ["asc", "desc"] else "asc"
+            reverse_sort = (sort == "desc")
+            studies = sorted(studies, key=lambda x: priority[x.priority], reverse=reverse_sort)
 
         if not studies:
             # se não há studies cadastrados
