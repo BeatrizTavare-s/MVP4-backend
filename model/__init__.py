@@ -5,6 +5,7 @@ import os
 
 # importando os elementos definidos no modelo
 from model.base import Base
+from model.category import Category
 from model.study import Study
 
 db_path = "database/"

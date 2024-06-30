@@ -12,7 +12,8 @@ class StudySchema(BaseModel):
     content: str = "Link PDF" 
     status: str = "completed" 
     priority: str = "high"
-
+    category_id: int = None
+    category_name: str = None
 
 class StudyBuscaSchema(BaseModel):
     """ Define como deve ser a estrutura que representa a busca. Que será
@@ -26,6 +27,7 @@ class StudyBuscaSchemaByFilters(BaseModel):
     """
     status: str = None
     sort: str = None
+    category: str = None
 
 
 
@@ -34,23 +36,23 @@ class ListagemStudiesSchema(BaseModel):
     """
     studies:List[StudySchema]
 
-
-def apresenta_studies(studies: List[Study]):
+def apresenta_studies(studies):
     """ Retorna uma representação do studies seguindo o schema definido em
         StudyViewSchema.
     """
-    result = []
-    for study in studies:
-        result.append({
+    def study_to_dict(study):
+        return {
             "id": study.id,
             "title": study.title,
             "description": study.description,
             "content": study.content,
             "status": study.status,
             "priority": study.priority,
-        })
+            "category_id": study.category_id,
+            "category_name": study.category.name if study.category else None
+        }
 
-    return {"studies": result}
+    return {"studies": [study_to_dict(study) for study in studies]}
 
 
 class StudyViewSchema(BaseModel):
@@ -62,6 +64,7 @@ class StudyViewSchema(BaseModel):
     content: str = "Link PDF Nodejs"
     priority: str = "high"
     status: str = "completed"
+    category_id: int = 1
 
 class StudyViewSchemaCompleted(BaseModel):
     """ Define mensagem quando o status for atualizado para completado.
@@ -92,5 +95,6 @@ def apresenta_study(study: Study):
         "description": study.description,
         "content": study.content,
         "status": study.status,
-        "priority": study.priority
+        "priority": study.priority,
+        "category_id": study.category_id
     }

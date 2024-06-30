@@ -1,11 +1,9 @@
 import enum
-from sqlalchemy import Column, String, Integer, DateTime, Float, Enum
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from typing import Union
-
-from  model import Base
-
+from  model import Base, Category
 
 class PriorityEnum(str, enum.Enum):
     high = "high"
@@ -25,9 +23,13 @@ class Study(Base):
     content = Column(String(225))
     status = Column(Enum(StatusEnum))
     priority = Column(Enum(PriorityEnum))
+    
+    # Cada study pode ter uma category
+    category_id = Column(Integer, ForeignKey(Category.id), nullable=True)
+    category = relationship("Category")
 
     def __init__(self, title:str, description:int, content:float,
-                 priority: str):
+                 priority: str, category_id: int = None):
         """
         Cria um Study
         Arguments:
@@ -42,3 +44,4 @@ class Study(Base):
         self.content = content
         self.status = "uncompleted"
         self.priority = priority
+        self.category_id = category_id
