@@ -6,14 +6,11 @@ from model.study import Study
 class StudySchema(BaseModel):
     """ Define como um novo study a ser inserido deve ser representado
     """
-    id: int = 1
     title: str = "NodeJS"
     description: str = "Estudar NodeJS" 
-    content: str = "Link PDF" 
-    status: str = "completed" 
+    content: str = "https://nodejs.org/docs/latest/api/" 
     priority: str = "high"
     category_id: int = None
-    category_name: str = None
 
 class StudyBuscaSchema(BaseModel):
     """ Define como deve ser a estrutura que representa a busca. Que será
