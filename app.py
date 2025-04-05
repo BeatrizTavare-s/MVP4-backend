@@ -1,4 +1,5 @@
 import enum
+import requests
 from flask_openapi3 import OpenAPI, Info, Tag
 from flask import redirect
 from urllib.parse import unquote
@@ -132,6 +133,57 @@ def uncompleted_study(query: StudyBuscaSchema):
         error_msg = "Não foi possível completar study :/"
         logger.warning(f"Erro ao atualizar para uncompleted o study '{query.id}', {error_msg}")
         return {"mesage": error_msg}, 400
+
+
+
+@app.patch('/study/schedule', tags=[study_tag],
+          responses={"200": StudyViewSchemaCompleted, "409": ErrorSchema, "400": ErrorSchema})
+def schedule_study(query: StudyBuscaSchema):
+    """Atualiza o status do Study à base de dados
+
+    Retorna uma representação dos studies.
+    """
+    study_id = query.id
+    logger.debug(f"Generete schedule to study de id: '{study_id}'")
+    try:
+        # criando conexão com a base
+        session = Session()
+        
+        # Busca o estudo
+        session_user = session.query(Study).filter(Study.id == study_id).first()
+        
+        if not session_user:
+            return {"message": "Study not found"}, 404
+        
+        # Chama a API de chat com o título do estudo
+        url = "https://mvp4-api-chat.onrender.com/chat?prompt=" + session_user.title
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            print("Resposta:", data)
+        else:
+            return {"mesage": error_msg}, 400
+        
+        # Adiciona um schema no estudo
+        updated_rows = session.query(Study).filter(Study.id == study_id).update({'schedule': data.content})
+        
+        if updated_rows == 0:
+            # Se nenhum estudo foi atualizado, retorna 404
+            error_msg = "Study não encontrado na base :/"
+            logger.warning(f"Erro ao buscar study '{study_id}', {error_msg}")
+            return {"message": error_msg}, 404
+        session.commit()
+        logger.debug(f"Completa study de id: '{query.id}'")
+        sucess_msg = "Study atualizado para não completado"
+        return {"mesage": sucess_msg}, 200
+    
+    except Exception as e:
+        # caso um erro fora do previsto
+        error_msg = "Não foi possível completar study :/"
+        logger.warning(f"Erro ao atualizar para uncompleted o study '{query.id}', {error_msg}")
+        return {"mesage": error_msg}, 400
+
 
 
 @app.get('/studies', tags=[study_tag],

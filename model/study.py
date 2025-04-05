@@ -1,5 +1,5 @@
 import enum
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, String, Integer, TEXT, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from typing import Union
@@ -23,15 +23,16 @@ class Study(Base):
     content = Column(String(225))
     status = Column(Enum(StatusEnum))
     priority = Column(Enum(PriorityEnum))
+    schedule = Column(TEXT)
     
     # Cada study pode ter uma category
     category_id = Column(Integer, ForeignKey(Category.id), nullable=True)
     category = relationship("Category")
 
     def __init__(self, title:str, description:int, content:float,
-                 priority: str, category_id: int = None):
+                 priority: str, schedule: str, category_id: int = None):
         """
-        Cria um Study
+        Cria um Study 
         Arguments:
             title: titulo do conteudo para ser estudado
             description: descrição do conteudo para estudo.
@@ -44,4 +45,5 @@ class Study(Base):
         self.content = content
         self.status = "uncompleted"
         self.priority = priority
+        self.schedule = schedule
         self.category_id = category_id
