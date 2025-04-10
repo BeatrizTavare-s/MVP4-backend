@@ -10,7 +10,7 @@ class StudySchema(BaseModel):
     description: str = "Estudar NodeJS" 
     content: str = "https://nodejs.org/docs/latest/api/" 
     priority: str = "high"
-    schedule: str = 'Cronograma'
+    schedule: Optional[str] = 'Cronograma'
     category_id: int = None
 
 class StudyBuscaSchema(BaseModel):
@@ -45,7 +45,7 @@ def apresenta_studies(studies):
             "content": study.content,
             "status": study.status,
             "priority": study.priority,
-            "schedule": study.schedule,
+            "schedule": study.schedule if study.schedule else None,
             "category_id": study.category_id,
             "category_name": study.category.name if study.category else None
         }
@@ -61,7 +61,7 @@ class StudyViewSchema(BaseModel):
     description: str = "Descrição Nodejs"
     content: str = "Link PDF Nodejs"
     priority: str = "high"
-    schedule: str = "Cronograma"
+    schedule: Optional[str] = "Cronograma"
     status: str = "completed"
     category_id: int = 1
 

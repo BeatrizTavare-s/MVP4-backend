@@ -7,3 +7,6 @@ pydantic
 SQLAlchemy
 SQLAlchemy-Utils
 typing_extensions
+requests
+sqlalchemy_utils
+flask-openapi3[swagger]

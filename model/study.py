@@ -23,7 +23,7 @@ class Study(Base):
     content = Column(String(225))
     status = Column(Enum(StatusEnum))
     priority = Column(Enum(PriorityEnum))
-    schedule = Column(TEXT)
+    schedule = Column(TEXT, nullable=True)
     
     # Cada study pode ter uma category
     category_id = Column(Integer, ForeignKey(Category.id), nullable=True)

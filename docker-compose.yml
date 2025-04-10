@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  node-api:
+    build: ./../MVP4-API-CHAT
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./../MVP4-API-CHAT/.env
+    networks:
+      - mvp-network
+    depends_on:
+      - postgres
+  
+  node-session-api:
+    build: ./../MVP4-API-session
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./../MVP4-API-session/.env
+    networks:
+      - mvp-network
+    depends_on:
+      - postgres
+
+  flask-api:
+    build: ./
+    ports:
+      - "5000:5000"
+    networks:
+      - mvp-network
+    volumes:
+      - ./database:/app/database 
+  postgres:
+    image: postgres
+    env_file:
+      - ./../MVP4-API-CHAT/.env
+    ports:
+      - "5432:5432"
+    networks:
+      - mvp-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+
+networks:
+  mvp-network:

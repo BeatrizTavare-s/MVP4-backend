@@ -1,5 +1,6 @@
 import enum
 import requests
+import json
 from flask_openapi3 import OpenAPI, Info, Tag
 from flask import redirect
 from urllib.parse import unquote
@@ -54,6 +55,7 @@ def add_study(body: StudySchema):
             description=body.description,
             content=body.content,
             priority=body.priority,
+            schedule = None,
             category_id=body.category_id)
         logger.debug(f"Adicionando study de titulo: '{study.title}'")
         # criando conexão com a base
@@ -137,53 +139,57 @@ def uncompleted_study(query: StudyBuscaSchema):
 
 
 @app.patch('/study/schedule', tags=[study_tag],
-          responses={"200": StudyViewSchemaCompleted, "409": ErrorSchema, "400": ErrorSchema})
+           responses={"200": StudyViewSchemaCompleted, "409": ErrorSchema, "400": ErrorSchema})
 def schedule_study(query: StudyBuscaSchema):
     """Atualiza o status do Study à base de dados
 
     Retorna uma representação dos studies.
     """
     study_id = query.id
-    logger.debug(f"Generete schedule to study de id: '{study_id}'")
+    logger.debug(f"Generate schedule to study de id: '{study_id}'")
+
     try:
         # criando conexão com a base
         session = Session()
-        
+
         # Busca o estudo
         session_user = session.query(Study).filter(Study.id == study_id).first()
-        
-        if not session_user:
-            return {"message": "Study not found"}, 404
-        
-        # Chama a API de chat com o título do estudo
-        url = "https://mvp4-api-chat.onrender.com/chat?prompt=" + session_user.title
-        response = requests.get(url)
+        print('session_user: ',session_user)
 
-        if response.status_code == 200:
-            data = response.json()
-            print("Resposta:", data)
-        else:
-            return {"mesage": error_msg}, 400
-        
-        # Adiciona um schema no estudo
-        updated_rows = session.query(Study).filter(Study.id == study_id).update({'schedule': data.content})
-        
-        if updated_rows == 0:
-            # Se nenhum estudo foi atualizado, retorna 404
+        if not session_user:
             error_msg = "Study não encontrado na base :/"
             logger.warning(f"Erro ao buscar study '{study_id}', {error_msg}")
             return {"message": error_msg}, 404
-        session.commit()
-        logger.debug(f"Completa study de id: '{query.id}'")
-        sucess_msg = "Study atualizado para não completado"
-        return {"mesage": sucess_msg}, 200
-    
-    except Exception as e:
-        # caso um erro fora do previsto
-        error_msg = "Não foi possível completar study :/"
-        logger.warning(f"Erro ao atualizar para uncompleted o study '{query.id}', {error_msg}")
-        return {"mesage": error_msg}, 400
 
+        # Verifica se já existe cronograma
+        print('session_user.schedule: ',session_user.schedule)
+        if not session_user.schedule:
+            prompt = 'Crie um cronograma de estudos sobre '+session_user.title+' com 8 semanas, incluindo atividades específicas de segunda a domingo para cada semana. Retorne apenas um JSON com a estrutura: {"title": "Cronograma de Estudos - '+ session_user.title +'", "semanas": [{"nome": "1ª Semana", "dias": [{"dia": "Segunda-feira", "atividade": "..."}, {"dia": "Terça-feira", "atividade": "..."}]}]} sem outras formatações.'
+            # url = "https://mvp4-api-chat.onrender.com/chat?prompt=" + prompt
+            url = "http://node-api:3000/chat?prompt=" + prompt
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                data = response.json()
+                print("Resposta:", data)
+
+                # Atualiza o campo schedule no banco
+                updated = session.query(Study).filter(Study.id == study_id).update({'schedule': data['content']})
+                session.commit()
+                logger.debug(f"Cronograma gerado para study de id: '{study_id}'")
+                return {"schedule": data['content']}, 200
+            else:
+                error_msg = "Erro ao buscar dados do cronograma externo."
+                return {"message": error_msg}, 400
+
+        else:
+            # Se já tem schedule, retorna o existente
+            return {"schedule": session_user.schedule}, 200
+
+    except Exception as e:
+        error_msg = "Não foi possível gerar cronograma study :/"
+        logger.warning(f"Erro ao gerar cronograma do study '{query.id}', {error_msg} - Detalhe: {e}")
+        return {"message": error_msg}, 400
 
 
 @app.get('/studies', tags=[study_tag],
