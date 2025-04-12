@@ -38,15 +38,15 @@ API desenvolvida em **Python + Flask** com banco de dados **SQLite**, feita para
 
 ### 📑 Swagger UI
 Documentação completa da API:
-![Swagger UI](./MVP04-swagger.PNG)
+![Swagger UI](./img-readme/MVP04-swagger.PNG)
 
 ### 🕒 Sessões de Estudo
 Adicione sessões com duração definida para cada tópico:
-![Sessões](./MVP04-sessoes.PNG)
+![Sessões](./img-readme/MVP04-sessoes.PNG)
 
 ### 📋 Cards de Estudo
 Visualização limpa e intuitiva com cards coloridos, categorias e botões de ação:
-![Cards](./MVP04-tela.PNG)
+![Cards](./img-readme/MVP04-tela.PNG)
 
 ---
 
