@@ -4,27 +4,6 @@
 API desenvolvida em **Python + Flask** com banco de dados **SQLite**, feita para organizar e acompanhar seus estudos através de **cards interativos**, **categorias** e **sessões de estudo**. Ideal para quem quer visualizar, organizar, marcar como concluído e gerar cronogramas de estudo via integração com IA.
 
 
-## 📌 Funcionalidades
-
-✅ Comunicação com múltiplas APIs:
-- 📘 **API Principal (Python)**: gerencia cards de estudo, categorias e cronogramas
-🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-backend)
-- 🌐 **Frontend (HTML/CSS/JS)**: interface web para interação com estudos, sessões e geração de PDFs  
-  🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-frontend)
-- 🧩 **API de Sessões (NodeJS)**: adiciona e lista sessões de estudo por assunto
-🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-API-SESSIONS)
-- 🤖 **API OpenAI (NodeJS)**: gera cronogramas semanais com ajuda da IA
-🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-API-CHAT)
-
-📄 Geração de PDFs:
-- PDF com **cronograma de estudo** retornado pela OpenAI
-- PDF com **lista de livros sugeridos** retornados pela Google Books API
-
-🎨 Interface amigável:
-- Cards coloridos por categoria
-- Botões para ações: concluir, excluir, gerar cronograma e buscar livros
-- Tabela de sessões de estudo por duração
-
 ## 🚀 Tecnologias Utilizadas
 
 - Python 3.12
@@ -121,3 +100,26 @@ Acesse no navegador:
 
 Confira o vídeo de apresentação do projeto no YouTube:  
 🔗 [https://www.youtube.com/watch?v=ZLq17Gpz654&ab_channel=BeatrizTavares](https://www.youtube.com/watch?v=ZLq17Gpz654&ab_channel=BeatrizTavares)
+
+
+
+## 📌 Projeto completo
+
+✅ Comunicação com múltiplas APIs:
+- 📘 **API Principal (Python)**: gerencia cards de estudo, categorias e cronogramas
+🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-backend)
+- 🌐 **Frontend (HTML/CSS/JS)**: interface web para interação com estudos, sessões e geração de PDFs  
+  🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-frontend)
+- 🧩 **API de Sessões (NodeJS)**: adiciona e lista sessões de estudo por assunto
+🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-API-SESSIONS)
+- 🤖 **API OpenAI (NodeJS)**: gera cronogramas semanais com ajuda da IA
+🔗 [Ver repositório](https://github.com/BeatrizTavare-s/MVP4-API-CHAT)
+
+📄 Geração de PDFs:
+- PDF com **cronograma de estudo** retornado pela OpenAI
+- PDF com **lista de livros sugeridos** retornados pela Google Books API
+
+🎨 Interface amigável:
+- Cards coloridos por categoria
+- Botões para ações: concluir, excluir, gerar cronograma e buscar livros
+- Tabela de sessões de estudo por duração
