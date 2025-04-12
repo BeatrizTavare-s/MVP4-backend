@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   node-api:
     build: ./../MVP4-API-CHAT
@@ -31,6 +29,18 @@ services:
       - mvp-network
     volumes:
       - ./database:/app/database 
+
+  front:
+    build: ./../MVP4-frontend
+    ports:
+      - "8080:80"
+    networks:
+      - mvp-network
+    depends_on:
+      - node-api
+      - node-session-api
+      - flask-api
+
   postgres:
     image: postgres
     env_file:

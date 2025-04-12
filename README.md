@@ -1,12 +1,56 @@
-# Minha API
 
-Este MVP é a entrega da primeira sprint da materia **Desenvolvimento Full Stack Básico** 
+# 📚 Study Content API
 
-O objetivo do MVP é criar um sistema para gerenciar conteúdos de estudo. Através deste sistema, é possível adicionar conteúdos para estudar e categorizá-los conforme necessário.
+API desenvolvida em **Python + Flask** com banco de dados **SQLite**, feita para organizar e acompanhar seus estudos através de **cards interativos**, **categorias** e **sessões de estudo**. Ideal para quem quer visualizar, organizar, marcar como concluído e gerar cronogramas de estudo via integração com IA.
+
+## 🚀 Tecnologias Utilizadas
+
+- Python 3.12
+- Flask
+- SQLite
+- Swagger para documentação da API
 
 ---
-## Como executar 
 
+## 📌 Funcionalidades da API
+
+### 🔍 **Documentação Interativa**
+- Disponível via Swagger, Redoc e RapiDoc
+- Rota: `GET /`
+
+### 🎓 **Study**
+- `GET /studies` → Lista todos os estudos
+- `GET /study` → Busca estudo por ID
+- `POST /study` → Cria um novo estudo
+- `PATCH /completed` → Marca estudo como concluído
+- `PATCH /uncompleted` → Reabre um estudo
+- `PATCH /schedule` → Atualiza o cronograma gerado por IA
+- `DELETE /study` → Remove um estudo por ID
+
+### 🗂️ **Category**
+- `GET /categories` → Lista todas as categorias
+- `POST /category` → Adiciona uma nova categoria
+- `DELETE /category` → Remove uma categoria por nome
+
+---
+
+## 🖼️ Interface Web
+
+### 📑 Swagger UI
+Documentação completa da API:
+![Swagger UI](./MVP04-swagger.PNG)
+
+### 🕒 Sessões de Estudo
+Adicione sessões com duração definida para cada tópico:
+![Sessões](./MVP04-sessoes.PNG)
+
+### 📋 Cards de Estudo
+Visualização limpa e intuitiva com cards coloridos, categorias e botões de ação:
+![Cards](./MVP04-tela.PNG)
+
+---
+
+## ⚙️ Como rodar o projeto localmente apenas a API - individualmente
 
 Será necessário ter todas as libs python listadas no `requirements.txt` instaladas.
 Após clonar o repositório, é necessário ir ao diretório raiz, pelo terminal, para poder executar os comandos descritos abaixo.
@@ -32,4 +76,26 @@ automaticamente após uma mudança no código fonte.
 (env)$ flask run --host 0.0.0.0 --port 5000 --reload
 ```
 
-Abra o [http://localhost:5000/#/](http://localhost:5000/#/) no navegador para verificar o status da API em execução.
+## ⚙️ Como rodar o projeto inteiro 
+
+```
+(env)$ docker compose up --build
+```
+
+Acesse no navegador:
+- Swagger: [http://localhost:5000/openapi](http://localhost:5000/openapi)
+
+---
+
+## 📅 Futuras Melhorias
+
+- Sistema de autenticação de usuários
+- Integração com Google Agenda
+- Dashboard com estatísticas de estudo
+
+---
+
+## 🎥 Demonstração do Projeto
+
+Confira o vídeo de apresentação do projeto no YouTube:  
+🔗 [https://www.youtube.com/watch?v=ZLq17Gpz654&ab_channel=BeatrizTavares](https://www.youtube.com/watch?v=ZLq17Gpz654&ab_channel=BeatrizTavares)
